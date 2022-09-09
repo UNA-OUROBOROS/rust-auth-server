@@ -1,10 +1,15 @@
 [package]
-name = "auth_server"
+name = "rust-auth-server"
 version = "0.1.0"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
+[workspace]
+members = [
+    "auth-server",
+    "auth-server-lib",
+]
+
 [dependencies]
-serde = "1.0.144"
-figment = { version = "0.10.7", features = ["toml", "env"] }
+
