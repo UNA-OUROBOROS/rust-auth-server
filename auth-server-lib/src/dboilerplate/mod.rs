@@ -3,14 +3,13 @@ use figment::{
     Figment,
 };
 
-pub fn getConfig(app_name: str) {
+pub fn getConfig(app_name: &str) {
     if (is_valid_identifier(app_name)) {
         let toml_name = format!("{}.toml", app_name);
 
-        let config = figment.extract::<Config>().unwrap();
         // search for the config file in the current directory
         // then in the upper directory, and so on until the root
-        let config = figment::new();
+        let config = Figment::new();
         // get the current directory
         let mut current_dir = std::env::current_dir();
         // loop until the root directory is reached
