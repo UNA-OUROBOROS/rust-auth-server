@@ -1,25 +1,15 @@
-
 use figment::{
     providers::{Env, Format, Toml},
     Figment,
 };
 
-use serde::Deserialize;
-
-#[derive(Deserialize)]
-pub struct Config {}
-pub struct DBoilerplateConfig {
-    pub figment: Figment,
-    pub config: Config,
-}
-
-pub fn get_config(app_name: &str) -> Result<DBoilerplateConfig, &str> {
+pub fn get_config<'a>(app_name: &'a str, environment: &'a str) -> Result<Figment, &'a str> {
     if is_valid_identifier(app_name) {
         let toml_name = format!("{}.toml", app_name);
 
         // search for the config file in the current directory
         // then in the upper directory, and so on until the root
-        let mut config: Figment = Figment::new();
+        let mut config: Figment = Figment::new().select(environment);
         // get the current directory
         let mut current_dir = std::env::current_dir().unwrap();
         // loop until the root directory is reached
@@ -43,14 +33,8 @@ pub fn get_config(app_name: &str) -> Result<DBoilerplateConfig, &str> {
         // then merge the config file
         let config_dir = dirs::config_dir().unwrap();
         config = config.merge(Toml::file(config_dir.join(toml_name)));
-        let configs = config.extract::<Config>();
-        return match configs {
-            Ok(result) => Ok(DBoilerplateConfig {
-                figment: config,
-                config: result,
-            }),
-            Err(_) => Err("Failed to load config"),
-        };
+
+        return Ok(config);
     }
 
     return Err("Invalid app name");
@@ -65,7 +49,7 @@ pub fn get_config(app_name: &str) -> Result<DBoilerplateConfig, &str> {
 ///
 /// ```
 /// use auth_server_lib::dboilerplate::configuration::is_valid_identifier;
-/// 
+///
 /// assert_eq!(is_valid_identifier("invalid name"), false);
 /// assert_eq!(is_valid_identifier("valid_name"), true);
 ///
