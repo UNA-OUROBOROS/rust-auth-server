@@ -1,6 +1,10 @@
 use serde::{Deserialize, Serialize};
+use rocket_okapi::okapi::{
+    schemars,
+    schemars::JsonSchema
+};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, JsonSchema)]
 pub struct UserCredentials<'r> {
     realm: &'r str,
     username: &'r str,

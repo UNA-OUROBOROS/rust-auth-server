@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 serde = { version ="1.0.144", features = ["derive"] }
+rocket_okapi = "0.8.0-rc.2"

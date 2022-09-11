@@ -9,3 +9,5 @@ edition = "2021"
 # use auth-server-lib
 auth-server-lib = { path = "../auth-server-lib" }
 rocket = { version = "0.5.0-rc.2", features = ["tls", "json", "http2"] }
+rocket_okapi = { version = "0.8.0-rc.2", features = ["swagger", "rapidoc"] }
+serde_json = "1.0.85"
