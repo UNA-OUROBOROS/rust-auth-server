@@ -52,7 +52,6 @@ pub fn get_config<'a>(app_name: &'a str, environment: &'a str) -> Result<Figment
 ///
 /// assert_eq!(is_valid_identifier("invalid name"), false);
 /// assert_eq!(is_valid_identifier("valid_name"), true);
-///
 /// ```
 pub fn is_valid_identifier(app_name: &str) -> bool {
     static INVALID_CHARS: [char; 15] = [
@@ -67,4 +66,10 @@ pub fn is_valid_identifier(app_name: &str) -> bool {
         }
     }
     true
+}
+
+
+/// checks wheter we are in debug mode or not
+pub fn is_debug() -> bool {
+    cfg!(debug_assertions)
 }

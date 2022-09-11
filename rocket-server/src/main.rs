@@ -1,7 +1,10 @@
 #[macro_use]
 extern crate rocket;
-
 extern crate auth_server_lib;
+extern crate dboilerplate;
+extern crate colored;
+
+use colored::*;
 
 use auth_server_lib::api::v1::authentication;
 
@@ -13,13 +16,7 @@ use rocket::{
 };
 
 use catchers::*;
-use rocket_okapi::{
-    openapi, openapi_get_routes,
-    rapidoc::*,
-    settings::UrlObject,
-    swagger_ui::*,
-};
-
+use rocket_okapi::{openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*};
 
 #[openapi(tag = "Users")]
 #[post("/login", data = "<credentials>", format = "application/json")]
@@ -52,32 +49,43 @@ fn login(
 
 #[launch]
 fn rocket() -> _ {
-    rocket::build()
-        .register("/", catchers![not_found, bad_request, unprocessable_entity])
-        // if we are in production only map the /api/v1 route
-        //.mount("/api/v1/", routes![login])
-        // we should check if is debug mode and show the docs only in debug mode
-        .mount("/api/v1", openapi_get_routes![
-            login
-        ])
-        .mount("/api/v1/swagger-ui/",
-        make_swagger_ui(&SwaggerUIConfig {
-            url: "../openapi.json".to_owned(),
-            ..Default::default()
-        }))
-        .mount("/api/v1/rapidoc/",
-            make_rapidoc(&RapiDocConfig{
-                general: GeneralConfig {
-                    spec_urls: vec![UrlObject::new("General", "../openapi.json")],
-                    ..Default::default()
-                },
-                hide_show: HideShowConfig {
-                    allow_spec_url_load: false,
-                    allow_spec_file_load: false,
-                    ..Default::default()
-                },
-                ..Default::default()
-            }),
-        )
-
+    let rocket_app =
+        rocket::build().register("/", catchers![not_found, bad_request, unprocessable_entity]);
+    match dboilerplate::util::configuration::is_debug() {
+        false => {
+            println!("{}", "*************************************".cyan());
+            println!("Running in {} mode", "production".green());
+            println!("{}", "*************************************".cyan());
+            rocket_app.mount("/api/v1/", routes![login])
+        }
+        true => {
+            println!("{}", "*************************************".cyan());
+            println!("Running in {} mode", "debug".yellow());
+            println!("{}", "*************************************".cyan());
+            rocket_app
+                .mount("/api/v1", openapi_get_routes![login])
+                .mount(
+                    "/api/v1/swagger-ui/",
+                    make_swagger_ui(&SwaggerUIConfig {
+                        url: "../openapi.json".to_owned(),
+                        ..Default::default()
+                    }),
+                )
+                .mount(
+                    "/api/v1/rapidoc/",
+                    make_rapidoc(&RapiDocConfig {
+                        general: GeneralConfig {
+                            spec_urls: vec![UrlObject::new("General", "../openapi.json")],
+                            ..Default::default()
+                        },
+                        hide_show: HideShowConfig {
+                            allow_spec_url_load: false,
+                            allow_spec_file_load: false,
+                            ..Default::default()
+                        },
+                        ..Default::default()
+                    }),
+                )
+        }
+    }
 }
