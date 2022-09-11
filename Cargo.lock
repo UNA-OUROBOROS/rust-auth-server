@@ -1003,8 +1003,8 @@ dependencies = [
 name = "rocket-server"
 version = "0.1.0"
 dependencies = [
+ "auth-server-lib",
  "rocket",
- "serde",
 ]
 
 [[package]]

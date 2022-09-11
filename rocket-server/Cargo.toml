@@ -6,5 +6,6 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+# use auth-server-lib
+auth-server-lib = { path = "../auth-server-lib" }
 rocket = { version = "0.5.0-rc.2", features = ["tls", "json", "http2"] }
-serde = "1.0.144"

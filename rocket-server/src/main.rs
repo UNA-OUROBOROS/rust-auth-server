@@ -1,10 +1,12 @@
 #[macro_use]
 extern crate rocket;
 
-pub mod api;
+extern crate auth_server_lib;
+
+use auth_server_lib::api::v1::authentication;
+
 mod catchers;
 
-use api::v1::authentication;
 use rocket::{
     http::Status,
     response::{content, status},
