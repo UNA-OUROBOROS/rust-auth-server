@@ -1,7 +1,4 @@
-pub mod dboilerplate;
+pub mod api;
 
 #[cfg(test)]
 mod tests;
-
-
-

@@ -102,8 +102,6 @@ dependencies = [
 name = "auth-server-lib"
 version = "0.1.0"
 dependencies = [
- "dirs",
- "figment",
  "serde",
 ]
 
@@ -217,6 +215,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "049bb91fb4aaf0e3c7efa6cd5ef877dbbbd15b39dad06d9948de4ec8a75761ea"
 dependencies = [
  "cipher",
+]
+
+[[package]]
+name = "dboilerplate"
+version = "0.1.0"
+dependencies = [
+ "dirs",
+ "figment",
 ]
 
 [[package]]

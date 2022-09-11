@@ -48,7 +48,7 @@ pub fn get_config<'a>(app_name: &'a str, environment: &'a str) -> Result<Figment
 /// # Examples
 ///
 /// ```
-/// use auth_server_lib::dboilerplate::configuration::is_valid_identifier;
+/// use dboilerplate::util::configuration::is_valid_identifier;
 ///
 /// assert_eq!(is_valid_identifier("invalid name"), false);
 /// assert_eq!(is_valid_identifier("valid_name"), true);
