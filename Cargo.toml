@@ -3,4 +3,5 @@ members = [
     "auth-server-lib",
     "dboilerplate",
     "rocket-server",
+    "token-helper",
 ]
