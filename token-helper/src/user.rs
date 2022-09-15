@@ -1,14 +1,14 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub struct UserData {
     // an user id of at least 36 characters long (alphanumeric)
     // this should be used for the application to identify the user
-    user_id: String,
+    pub user_id: String,
     // the user realm where he comes from (so the user can have the same id in different realms)
     // however the user id is unique across all realms
-    realm: String,
+    pub realm: String,
     // used if this user is an alias of another user(ex: the user was mapped from 2fa to an existing user)
     // accepted values '=' for false and ~ for true
-    is_alias: bool,
+    pub is_alias: bool,
 }
 
 impl UserData {
@@ -66,7 +66,7 @@ impl UserData {
     /// ```
     /// use token_helper::user::UserData;
     ///
-    /// let subject = "=-1234567890abcdef1234567890abcdef12345678-example.com";
+    /// let subject = "=:1234567890abcdef1234567890abcdef12345678:example.com";
     /// let user_data = UserData::from_subject(subject).unwrap();
     /// assert_eq!(user_data.user_id, "1234567890abcdef1234567890abcdef12345678");
     /// assert_eq!(user_data.realm, "example.com");
@@ -74,7 +74,7 @@ impl UserData {
     /// ```
     ///
     pub fn from_subject(subject: &str) -> Result<Self, String> {
-        let mut parts = subject.split('-');
+        let mut parts = subject.split(':');
         // the alias can be = or ~
         let is_alias = match parts.next().ok_or("invalid alias")? {
             "=" => false,
@@ -87,18 +87,18 @@ impl UserData {
     }
 
     /// returns the subject in the following format:
-    /// {user_id}-{realm} 1234567890abcdef1234567890abcdef12345678-example.com
+    /// {is_alias}:{user_id}:{realm} 1234567890abcdef1234567890abcdef12345678:example.com
     ///
     /// #example
     /// ```
     /// use token_helper::user::UserData;
     ///
     /// let user_data = UserData::new("1234567890abcdef1234567890abcdef12345678".to_string(), "example.com".to_string(), false).unwrap();
-    /// assert_eq!(user_data.get_subject(), "=-1234567890abcdef1234567890abcdef12345678-example.com");
+    /// assert_eq!(user_data.get_subject(), "=:1234567890abcdef1234567890abcdef12345678:example.com");
     /// ```
     pub fn get_subject(&self) -> String {
         format!(
-            "{}-{}-{}",
+            "{}:{}:{}",
             if self.is_alias { "~" } else { "=" },
             self.user_id,
             self.realm,

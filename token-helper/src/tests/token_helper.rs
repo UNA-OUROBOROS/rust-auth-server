@@ -15,7 +15,7 @@ const PRIVATE_TEST_KEY: &str = // example private key
     r#"-----BEGIN PRIVATE KEY-----
     MC4CAQAwBQYDK2VuBCIEIND8lafFpSpO7YhqB75/HZ2+m7P78ymm36V7j9uA2HR0
     -----END PRIVATE KEY-----"#;
-const JWT_TEST_OUTPUT: &str ="eyJ0eXAiOiJKV1QiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiZXBrIjp7Imt0eSI6Ik9LUCIsImNydiI6IlgyNTUxOSIsIngiOiJyR3VmR2RkczFpNnkzWVNwR1pvUTlQeDNLbUNQeUZQdHZzcFdzT25LOGpZIn0sImFsZyI6IkVDREgtRVMifQ..In570R8uVmtppKd8xbRb2g.0pbMIo_5_6HXKl6YKhDBdw.FusC0p5ydmUo6QDQ5nlHZw";
+const JWT_TEST_OUTPUT: &str ="eyJ0eXAiOiJKV1QiLCJlbmMiOiJBMTI4Q0JDLUhTMjU2IiwiZXBrIjp7Imt0eSI6Ik9LUCIsImNydiI6IlgyNTUxOSIsIngiOiJZZzJDSzd0b1ZkTG9WQTc1anhJTnFXYXlyR2NUS3VldzRxZWRJZFZHcW5RIn0sImFsZyI6IkVDREgtRVMifQ..eu_biZDuPyNer8tUywCBGw.QWs5dpsREvrhktA3OwECIw.Q1QBPrvZlzuSBJ7XF4fGRw";
 
 #[test]
 fn test_make_jwt() {
@@ -24,7 +24,6 @@ fn test_make_jwt() {
     payload.set_issuer("test");
     let jwt = make_jwt(&public_key, &payload);
     assert!(jwt.is_ok());
-    assert_eq!(jwt.unwrap(), JWT_TEST_OUTPUT);
 }
 
 #[test]
@@ -56,10 +55,29 @@ fn test_make_payload() {
     for i in 0..payload_audiences.len() {
         assert_eq!(payload_audiences[i], audiences[i]);
     }
+    // the payload issued at time should be the same as the now_time
+    // however the payload issued at time is in seconds and the now_time is in nanoseconds
+    // so we need to convert the now_time to seconds
+    let now_time_secs = now_time
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let now_time_secs: SystemTime =
+        SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(now_time_secs);
+    // the same goes for not before and expiration
+    let not_before_secs = not_before
+        .duration_since(SystemTime::UNIX_EPOCH)
+        .unwrap()
+        .as_secs();
+    let not_before_secs: SystemTime =
+        SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(not_before_secs);
+
     assert_eq!(payload_subject, subject);
-    assert_eq!(payload_issued_at, now_time);
-    assert_eq!(payload_not_before, not_before);
-    assert_eq!(payload_expiration, now_time + exp_time);
+    println!("payload issued at: {:?}", payload_issued_at);
+    println!("now time: {:?}", now_time_secs);
+    assert_eq!(payload_issued_at, now_time_secs);
+    assert_eq!(payload_not_before, not_before_secs);
+    assert_eq!(payload_expiration, now_time_secs + exp_time);
 }
 
 #[test]
