@@ -9,3 +9,4 @@ edition = "2021"
 figment = { version = "0.10.7", features = ["toml", "env"] }
 dirs = "4.0.0"
 dotenvy = "0.15.3"
+diesel = { version = "2.0.0", features = ["postgres"] }
