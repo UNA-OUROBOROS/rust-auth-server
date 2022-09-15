@@ -1,1 +1,3 @@
 /target
+# ignore dotenv files
+*.env

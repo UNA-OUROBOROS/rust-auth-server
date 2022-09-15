@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 figment = { version = "0.10.7", features = ["toml", "env"] }
 dirs = "4.0.0"
+dotenvy = "0.15.3"
