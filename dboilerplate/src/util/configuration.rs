@@ -3,7 +3,7 @@ use figment::{
     Figment,
 };
 
-use dotenvy::dotenvy;
+use dotenvy::dotenv;
 
 /// search for the config file in the current directory
 /// then in the upper directory, and so on until the root
@@ -118,8 +118,8 @@ fn get_default_app_name(environment: Option<String>) -> Option<String> {
         }
     }
     // check in dotenv file (dotenvy)
-    if let Ok(dotenv) = dotenvy::dotenv() {
-        for (key, value) in dotenv {
+    if dotenv().is_ok() {
+        for (key, value) in std::env::vars() {
             if key == "APP_NAME" {
                 return Some(value);
             }
@@ -141,14 +141,8 @@ fn get_default_environment() -> String {
             return arg.replace("--environment=", "");
         }
     }
-    // check in dotenv file (dotenvy)
-    if let Ok(dotenv) = dotenvy::dotenv() {
-        for (key, value) in dotenv {
-            if key == "ENVIRONMENT" {
-                return value;
-            }
-        }
-    }
+    // load dotenv file (dotenvy)
+    dotenv().ok();
     // check in the environment variables
     if let Ok(environment) = std::env::var("APP_ENVIRONMENT") {
         return environment;
