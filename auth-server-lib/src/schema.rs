@@ -3,6 +3,7 @@
 diesel::table! {
     user_passwords (user_id, realm) {
         user_id -> Varchar,
+        username -> Varchar,
         realm -> Varchar,
         password_hash -> Varchar,
     }
@@ -11,6 +12,8 @@ diesel::table! {
 diesel::table! {
     users (id) {
         id -> Varchar,
+        is_alias -> Bool,
+        alias_of -> Nullable<Varchar>,
     }
 }
 

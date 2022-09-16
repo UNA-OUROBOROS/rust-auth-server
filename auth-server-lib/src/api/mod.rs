@@ -1,1 +1,3 @@
-pub mod authentication;
+pub mod endpoints;
+pub mod errors;
+pub mod model;

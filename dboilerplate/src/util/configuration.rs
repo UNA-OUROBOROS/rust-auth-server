@@ -30,10 +30,7 @@ fn get_default_config_file(environment: &str) -> Figment {
     return config;
 }
 
-pub fn get_config<'a>(
-    app_name: Option<String>,
-    environment: Option<&'a str>,
-) -> Result<Figment, &'a str> {
+pub fn get_config<'a>(app_name: Option<String>, environment: Option<&'a str>) -> Figment {
     let environment = match environment {
         Some(env) => env,
         None => "default",
@@ -45,25 +42,19 @@ pub fn get_config<'a>(
     } else {
         get_default_app_name(Some(environment.to_string()))
     };
-    match app_name {
-        Some(app_name) => {
-            if is_valid_identifier(&app_name) {
-                let toml_name = format!("{}.toml", app_name);
-                // merge the environment variables
-                config = config.merge(Env::prefixed(app_name.to_uppercase().as_str()));
-                // then merge the app config file
-                let config_dir = dirs::config_dir().unwrap();
-                config = config.merge(Toml::file(config_dir.join(toml_name)));
-                return Ok(config);
-            }
-
-            Err("Invalid app name")
-        }
-        None => {
-            // just return the default config
-            Ok(config)
+    if app_name.is_some() {
+        let app_name = app_name.unwrap();
+        config = config.merge(Env::prefixed(&app_name.to_uppercase()));
+        if is_valid_identifier(&app_name) {
+            let toml_name = format!("{}.toml", app_name);
+            // merge the environment variables
+            config = config.merge(Env::prefixed(app_name.to_uppercase().as_str()));
+            // then merge the app config file
+            let config_dir = dirs::config_dir().unwrap();
+            return config.merge(Toml::file(config_dir.join(toml_name)));
         }
     }
+    return config;
 }
 
 /// Checks if the application name is an valid identifier.

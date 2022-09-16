@@ -1,12 +1,11 @@
 #[macro_use]
 extern crate rocket;
 extern crate auth_server_lib;
-extern crate dboilerplate;
 extern crate colored;
 
 use colored::*;
 
-use auth_server_lib::api::authentication;
+use auth_server_lib::api::endpoints;
 
 mod catchers;
 
@@ -21,9 +20,9 @@ use rocket_okapi::{openapi, openapi_get_routes, rapidoc::*, settings::UrlObject,
 #[openapi(tag = "Users")]
 #[post("/login", data = "<credentials>", format = "application/json")]
 fn login(
-    credentials: Json<authentication::UserCredentials<'_>>,
+    credentials: Json<endpoints::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
-    match authentication::login(credentials.into_inner()) {
+    match endpoints::login(credentials.into_inner()) {
         Ok(creds) => (
             Status::Ok,
             (
@@ -51,7 +50,7 @@ fn login(
 fn rocket() -> _ {
     let rocket_app =
         rocket::build().register("/", catchers![not_found, bad_request, unprocessable_entity]);
-    match dboilerplate::util::configuration::is_debug() {
+    match cfg!(debug_assertions) {
         false => {
             println!("{}", "*************************************".cyan());
             println!("Running in {} mode", "production".green());

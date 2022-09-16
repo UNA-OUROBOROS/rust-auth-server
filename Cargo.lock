@@ -132,8 +132,11 @@ dependencies = [
 name = "auth-server-lib"
 version = "0.1.0"
 dependencies = [
+ "dboilerplate",
+ "diesel",
  "rocket_okapi",
  "serde",
+ "token-helper",
 ]
 
 [[package]]
@@ -1343,7 +1346,6 @@ version = "0.1.0"
 dependencies = [
  "auth-server-lib",
  "colored",
- "dboilerplate",
  "rocket",
  "rocket_okapi",
  "serde_json",
