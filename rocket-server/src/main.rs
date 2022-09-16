@@ -6,7 +6,7 @@ extern crate colored;
 
 use colored::*;
 
-use auth_server_lib::api::v1::authentication;
+use auth_server_lib::api::authentication;
 
 mod catchers;
 
