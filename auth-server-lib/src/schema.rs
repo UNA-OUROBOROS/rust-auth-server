@@ -1,10 +1,11 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    user_passwords (user_id, realm) {
+    user_passwords (relation_id) {
+        relation_id -> Int4,
         user_id -> Varchar,
         username -> Varchar,
-        realm -> Varchar,
+        realm -> Nullable<Varchar>,
         password_hash -> Varchar,
     }
 }

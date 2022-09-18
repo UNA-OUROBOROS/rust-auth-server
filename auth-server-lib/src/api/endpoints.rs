@@ -8,16 +8,22 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Serialize, Deserialize, JsonSchema)]
 pub struct UserCredentials<'r> {
-    realm: &'r str,
+    realm: Option<&'r str>,
     username: &'r str,
     password: &'r str,
 }
 
 pub fn login(credentials: UserCredentials) -> Result<String, ErrorDetails> {
     let connection = &mut get_database_connection()?;
-    let result = user_passwords
-        .filter(user_id.eq(credentials.username))
-        .filter(realm.eq(credentials.realm))
+    let query = user_passwords.filter(user_id.eq(credentials.username));
+    if credentials.realm.is_some() {
+        query.filter(realm.eq(credentials.realm.unwrap()));
+    } else {
+        query.filter(realm.is_null());
+    }
+    // if realm is not specified, then we will use the null value in the filter
+
+    let result = query
         .load::<UserPasswords>(connection)
         .map_err(|e| ERR_BACKEND_QUERY_FAILED.with_internal_error(e.to_string()))?;
     match result.get(0) {

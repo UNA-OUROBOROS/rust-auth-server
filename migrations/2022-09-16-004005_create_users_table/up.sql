@@ -12,6 +12,7 @@ CREATE TABLE users (
     PRIMARY KEY (id)
 );
 
+-- the relation_id is to keep track of the records(identity)
 -- contains the user id(from users table)
 -- the username (max 64 characters)
 -- their realm(dns name witouth '-')
@@ -19,10 +20,11 @@ CREATE TABLE users (
 -- if the realm is null is an internal user from the app
 -- if not this is an email user
 create table user_passwords (
+    relation_id SERIAL PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     username VARCHAR(64) NOT NULL,
     realm VARCHAR(255) NULL,
     password_hash VARCHAR(255) NOT NULL,
-    PRIMARY KEY (user_id, realm),
+    UNIQUE (username, realm),
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
