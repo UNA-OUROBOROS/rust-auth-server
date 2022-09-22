@@ -7,7 +7,7 @@ pub struct ErrorDetails {
     pub message: &'static str,
     // do not serialize this field
     #[serde(skip_serializing)]
-    pub(crate) internal_error: Option<String>,
+    pub internal_error: Option<String>,
 }
 
 impl ErrorDetails {

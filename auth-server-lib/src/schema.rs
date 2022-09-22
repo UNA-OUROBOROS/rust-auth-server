@@ -2,7 +2,7 @@
 
 diesel::table! {
     user_passwords (relation_id) {
-        relation_id -> Int4,
+        relation_id -> Int8,
         user_id -> Varchar,
         username -> Varchar,
         realm -> Nullable<Varchar>,

@@ -20,7 +20,7 @@ CREATE TABLE users (
 -- if the realm is null is an internal user from the app
 -- if not this is an email user
 create table user_passwords (
-    relation_id SERIAL PRIMARY KEY,
+    relation_id BIGSERIAL PRIMARY KEY,
     user_id VARCHAR(36) NOT NULL,
     username VARCHAR(64) NOT NULL,
     realm VARCHAR(255) NULL,

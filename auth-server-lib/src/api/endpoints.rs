@@ -1,7 +1,6 @@
 use crate::api::{errors::*, model::get_database_connection, model::UserPasswords};
-use crate::schema::user_passwords::dsl::*;
+
 use diesel::prelude::*;
-use token_helper::user::UserData;
 
 use rocket_okapi::okapi::{schemars, schemars::JsonSchema};
 use serde::{Deserialize, Serialize};
@@ -14,12 +13,14 @@ pub struct UserCredentials<'r> {
 }
 
 pub fn login(credentials: UserCredentials) -> Result<String, ErrorDetails> {
+    use crate::schema::user_passwords::dsl::*;
     let connection = &mut get_database_connection()?;
-    let query = user_passwords.filter(user_id.eq(credentials.username));
+    let mut query = user_passwords.into_boxed();
+    query = query.filter(user_id.eq(credentials.username));
     if credentials.realm.is_some() {
-        query.filter(realm.eq(credentials.realm.unwrap()));
+        query = query.filter(realm.eq(credentials.realm.unwrap()));
     } else {
-        query.filter(realm.is_null());
+        query = query.filter(realm.is_null());
     }
     // if realm is not specified, then we will use the null value in the filter
 

@@ -14,9 +14,10 @@ pub(crate) fn get_database_connection() -> Result<PgConnection, ErrorDetails> {
 
 #[derive(Queryable)]
 pub(crate) struct UserPasswords {
+    pub relation_id: i64,
     pub user_id: String,
     pub username: String,
-    pub realm: String,
+    pub realm: Option<String>,
     pub password: String,
 }
 
