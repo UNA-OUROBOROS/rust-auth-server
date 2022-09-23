@@ -1,8 +1,3 @@
-// <algorithm>$<iterations>$<salt>$<hash>
-// by default we will use argon2 as algorithm (argon2id) with the default parameters
-// as for the salt is by default 128 bits(16 bytes) long
-// it is generated using rand::thread_rng()
-
 use argon2::{
     password_hash::{
         rand_core::OsRng, PasswordHash, PasswordHasher as Argon2PasswordHasher, PasswordVerifier,
