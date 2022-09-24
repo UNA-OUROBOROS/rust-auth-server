@@ -1,2 +1,1 @@
-mod hasher;
-mod password_hashers;
+pub(crate) mod password_hasher;

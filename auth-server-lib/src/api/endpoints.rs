@@ -1,4 +1,7 @@
-use crate::api::{errors::*, model::get_database_connection, model::UserPasswords};
+use crate::{
+    api::{errors::*, model::get_database_connection, model::UserPasswords},
+    util::security::password_hasher::{self, argon2::Argon2Hasher, PasswordHasher},
+};
 
 use diesel::prelude::*;
 
@@ -29,12 +32,17 @@ pub fn login(credentials: UserCredentials) -> Result<String, ErrorDetails> {
         .map_err(|e| ERR_BACKEND_QUERY_FAILED.with_internal_error(e.to_string()))?;
     match result.get(0) {
         Some(user) => {
-            // TODO: hash password
-            if user.password == credentials.password {
-                //let user_data = UserData::new(user.username.clone(), user.realm.clone());
-                return Ok("".to_string());
-            } else {
-                Err(ERR_AUTHENTICATION_FAILED)
+            match <Argon2Hasher as PasswordHasher>::verify_password(
+                credentials.password.as_bytes(),
+                user.password.as_bytes(),
+            ) {
+                Ok(_) => {
+                    //let user_data = UserData::new(user.username.clone(), user.realm.clone());
+                    return Ok("".to_string());
+                }
+                Err(e) => {
+                    return Err(ERR_AUTHENTICATION_FAILED.with_internal_error(e.to_string()));
+                }
             }
         }
         None => Err(ERR_AUTHENTICATION_FAILED.with_internal_error("user not found".to_string())),
