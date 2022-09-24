@@ -46,12 +46,13 @@ pub fn get_config<'a>(app_name: Option<String>, environment: Option<&'a str>) ->
         let app_name = app_name.unwrap();
         config = config.merge(Env::prefixed(&app_name.to_uppercase()));
         if is_valid_identifier(&app_name) {
-            let toml_name = format!("{}.toml", app_name);
+            // then merge the app config file
+            let toml_name = "config.toml";
+            let config_dir = dirs::config_dir().unwrap();
+            let config_file = config_dir.join(&app_name).join(toml_name);
+            config = config.merge(Toml::file(config_file));
             // merge the environment variables
             config = config.merge(Env::prefixed(app_name.to_uppercase().as_str()));
-            // then merge the app config file
-            let config_dir = dirs::config_dir().unwrap();
-            return config.merge(Toml::file(config_dir.join(toml_name)));
         }
     }
     return config;
@@ -108,14 +109,8 @@ fn get_default_app_name(environment: Option<String>) -> Option<String> {
             return Some(arg.replace("--app-name=", ""));
         }
     }
-    // check in dotenv file (dotenvy)
-    if dotenv().is_ok() {
-        for (key, value) in std::env::vars() {
-            if key == "APP_NAME" {
-                return Some(value);
-            }
-        }
-    }
+    // load the dotenv file, if failed ignore silently
+    dotenv().ok();
     // check in the environment variables
     if let Ok(app_name) = std::env::var("APP_NAME") {
         return Some(app_name);

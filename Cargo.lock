@@ -146,6 +146,7 @@ dependencies = [
  "argon2",
  "dboilerplate",
  "diesel",
+ "rand",
  "rand_core",
  "rocket_okapi",
  "serde",

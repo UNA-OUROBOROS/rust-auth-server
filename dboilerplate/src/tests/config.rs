@@ -1,4 +1,4 @@
-use crate::util::configuration::is_valid_identifier;
+use crate::util::configuration::{is_valid_identifier};
 
 #[test]
 fn test_invalid_identifiers() {

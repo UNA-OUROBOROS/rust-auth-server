@@ -5,7 +5,7 @@ extern crate colored;
 
 use colored::*;
 
-use auth_server_lib::api::endpoints;
+use auth_server_lib::api::{endpoints, model};
 
 mod catchers;
 
@@ -15,12 +15,14 @@ use rocket::{
 };
 
 use catchers::*;
-use rocket_okapi::{openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*};
+use rocket_okapi::{
+    openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*,
+};
 
 #[openapi(tag = "Users")]
 #[post("/login", data = "<credentials>", format = "application/json")]
 fn login(
-    credentials: Json<endpoints::UserCredentials<'_>>,
+    credentials: Json<model::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
     match endpoints::login(credentials.into_inner()) {
         Ok(creds) => (
@@ -34,7 +36,36 @@ fn login(
             ),
         ),
         Err(err) => (
-            Status::Unauthorized,
+            Status::new(err.http_code),
+            (
+                ContentType::JSON,
+                json!({
+                    "result": "failed",
+                    "error": err
+                }),
+            ),
+        ),
+    }
+}
+
+#[openapi(tag = "Users")]
+#[post("/register", data = "<credentials>", format = "application/json")]
+fn register_by_email_password(
+    credentials: Json<model::UserCredentials<'_>>,
+) -> (Status, (ContentType, serde_json::Value)) {
+    match endpoints::register_new_user_email_password(credentials.into_inner()) {
+        Ok(user_id) => (
+            Status::Ok,
+            (
+                ContentType::JSON,
+                json!({
+                    "result": "success",
+                    "credentials": user_id
+                }),
+            ),
+        ),
+        Err(err) => (
+            Status::new(err.http_code),
             (
                 ContentType::JSON,
                 json!({
@@ -55,14 +86,17 @@ fn rocket() -> _ {
             println!("{}", "*************************************".cyan());
             println!("Running in {} mode", "production".green());
             println!("{}", "*************************************".cyan());
-            rocket_app.mount("/api/v1/", routes![login])
+            rocket_app.mount("/api/v1/", routes![login, register_by_email_password])
         }
         true => {
             println!("{}", "*************************************".cyan());
             println!("Running in {} mode", "debug".yellow());
             println!("{}", "*************************************".cyan());
             rocket_app
-                .mount("/api/v1", openapi_get_routes![login])
+                .mount(
+                    "/api/v1",
+                    openapi_get_routes![login, register_by_email_password],
+                )
                 .mount(
                     "/api/v1/swagger-ui/",
                     make_swagger_ui(&SwaggerUIConfig {
