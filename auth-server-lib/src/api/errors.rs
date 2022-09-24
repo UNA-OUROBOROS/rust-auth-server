@@ -52,3 +52,10 @@ pub const ERR_BACKEND_QUERY_FAILED: ErrorDetails = ErrorDetails {
     message: "Could not query the internal backend",
     internal_error: None,
 };
+// database value not found
+pub const ERR_DATABASE_VALUE_NOT_FOUND: ErrorDetails = ErrorDetails {
+    code: 404,
+    code_name: "ERR-DATABASE-VALUE-NOT-FOUND",
+    message: "Could not find the requested value in the database",
+    internal_error: None,
+};

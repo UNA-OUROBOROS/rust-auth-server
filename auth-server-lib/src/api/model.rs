@@ -13,17 +13,33 @@ pub(crate) fn get_database_connection() -> Result<PgConnection, ErrorDetails> {
 }
 
 #[derive(Queryable)]
-pub(crate) struct UserPasswords {
-    pub relation_id: i64,
+pub(crate) struct UserCredentials {
     pub user_id: String,
-    pub username: String,
-    pub realm: Option<String>,
-    pub password: String,
+    pub user_email: String,
+    pub password_hash: String,
 }
 
 #[derive(Queryable)]
 pub(crate) struct Users {
     pub id: String,
-    pub is_alias: bool,
-    pub alias_of: Option<String>,
+}
+
+pub(crate) fn get_user_credentials(
+    connection: &mut PgConnection,
+    user_email: &str,
+) -> Result<UserCredentials, ErrorDetails> {
+    use crate::schema::{user_emails, user_passwords};
+    let query = user_emails::table
+        .inner_join(user_passwords::table.on(user_emails::user_id.eq(user_passwords::user_id)))
+        .filter(user_emails::email.eq(user_email))
+        .select((
+            user_emails::user_id,
+            user_emails::email,
+            user_passwords::password_hash,
+        ));
+    let result = query.get_result::<UserCredentials>(connection);
+    match result {
+        Ok(user) => Ok(user),
+        Err(e) => Err(ERR_DATABASE_VALUE_NOT_FOUND.with_internal_error(e.to_string())),
+    }
 }

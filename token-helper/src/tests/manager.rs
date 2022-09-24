@@ -19,7 +19,6 @@ fn test_encode_user_data() {
     let user_data = UserData::new(
         "1234567890abcdef1234567890abcdef12345678".to_string(),
         "test-realm".to_string(),
-        false,
     )
     .unwrap();
     let public_key = PUBLIC_TEST_KEY.to_vec();
@@ -47,7 +46,6 @@ fn test_decode_user_data() {
     let user_data = UserData::new(
         "1234567890abcdef1234567890abcdef12345678".to_string(),
         "test-realm".to_string(),
-        false,
     )
     .unwrap();
 
