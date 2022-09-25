@@ -80,3 +80,10 @@ pub const ERR_DATABASE_TRANSACTION_FAILED: ErrorDetails = ErrorDetails {
     message: "the backend could not process the request",
     internal_error: None,
 };
+// existing record found
+pub const ERR_DATABASE_RECORD_EXISTS: ErrorDetails = ErrorDetails {
+    http_code: 409,
+    code_name: "ERR-RECORD-ALREADY-EXISTS",
+    message: "The record already exists",
+    internal_error: None,
+};

@@ -15,15 +15,14 @@ use rocket::{
 };
 
 use catchers::*;
-use rocket_okapi::{
-    openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*,
-};
+use rocket_okapi::{openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*};
 
 #[openapi(tag = "Users")]
 #[post("/login", data = "<credentials>", format = "application/json")]
 fn login(
     credentials: Json<model::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
+    // set the cors header
     match endpoints::login(credentials.into_inner()) {
         Ok(creds) => (
             Status::Ok,
@@ -49,7 +48,7 @@ fn login(
 }
 
 #[openapi(tag = "Users")]
-#[post("/register", data = "<credentials>", format = "application/json")]
+#[post("/register/email", data = "<credentials>", format = "application/json")]
 fn register_by_email_password(
     credentials: Json<model::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
@@ -64,16 +63,31 @@ fn register_by_email_password(
                 }),
             ),
         ),
-        Err(err) => (
-            Status::new(err.http_code),
+        Err(err) => {
+            //
+            if err.code_name == "ERR-RECORD-ALREADY-EXISTS" {
+                return (
+                    Status::new(err.http_code),
+                    (
+                        ContentType::JSON,
+                        json!({
+                            "result": "failed",
+                            "error": "MAIL-ALREADY-IN-USE"
+                        }),
+                    ),
+                );
+            }
             (
-                ContentType::JSON,
-                json!({
-                    "result": "failed",
-                    "error": err
-                }),
-            ),
-        ),
+                Status::new(err.http_code),
+                (
+                    ContentType::JSON,
+                    json!({
+                        "result": "failed",
+                        "error": err
+                    }),
+                ),
+            )
+        }
     }
 }
 

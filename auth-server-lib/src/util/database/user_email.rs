@@ -54,6 +54,14 @@ pub(crate) fn register_new_user_email_password(
     user_email: &str,
     password_hash: &str,
 ) -> Result<String, ErrorDetails> {
+    // check that the email is not already in use
+    let credentials = get_user_credentials(connection, user_email);
+    if credentials.is_ok() {
+        return Err(
+            ERR_DATABASE_RECORD_EXISTS.with_internal_error("email already in use".to_string())
+        );
+    }
+
     // the user is a random 36 character string(case insensitive, alphanumeric)
     let new_user_id: String = rand::thread_rng()
         .sample_iter(&rand::distributions::Alphanumeric)
