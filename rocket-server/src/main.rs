@@ -100,7 +100,7 @@ fn rocket() -> _ {
             println!("{}", "*************************************".cyan());
             println!("Running in {} mode", "production".green());
             println!("{}", "*************************************".cyan());
-            rocket_app.mount("/api/v1/", routes![login, register_by_email_password])
+            rocket_app.mount("/auth", routes![login, register_by_email_password])
         }
         true => {
             println!("{}", "*************************************".cyan());
@@ -108,7 +108,7 @@ fn rocket() -> _ {
             println!("{}", "*************************************".cyan());
             rocket_app
                 .mount(
-                    "/api/v1",
+                    "/auth",
                     openapi_get_routes![login, register_by_email_password],
                 )
                 .mount(
