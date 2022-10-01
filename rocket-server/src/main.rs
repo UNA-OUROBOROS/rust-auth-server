@@ -3,6 +3,8 @@ extern crate rocket;
 extern crate auth_server_lib;
 extern crate colored;
 
+use std::fmt::format;
+
 use colored::*;
 
 use auth_server_lib::api::{endpoints, model};
@@ -10,7 +12,7 @@ use auth_server_lib::api::{endpoints, model};
 mod catchers;
 
 use rocket::{
-    http::{ContentType, Status},
+    http::{tls::rustls::internal::msgs::base, ContentType, Status},
     serde::json::{serde_json::json, Json},
 };
 
@@ -18,7 +20,7 @@ use catchers::*;
 use rocket_okapi::{openapi, openapi_get_routes, rapidoc::*, settings::UrlObject, swagger_ui::*};
 
 #[openapi(tag = "Users")]
-#[post("/login", data = "<credentials>", format = "application/json")]
+#[post("/email/login", data = "<credentials>", format = "application/json")]
 fn login(
     credentials: Json<model::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
@@ -48,7 +50,7 @@ fn login(
 }
 
 #[openapi(tag = "Users")]
-#[post("/register/email", data = "<credentials>", format = "application/json")]
+#[post("/email/register", data = "<credentials>", format = "application/json")]
 fn register_by_email_password(
     credentials: Json<model::UserCredentials<'_>>,
 ) -> (Status, (ContentType, serde_json::Value)) {
@@ -93,6 +95,8 @@ fn register_by_email_password(
 
 #[launch]
 fn rocket() -> _ {
+    let base_url = "/auth";
+    let openapi_json_url = format!("{}/openapi.json", base_url);
     let rocket_app =
         rocket::build().register("/", catchers![not_found, bad_request, unprocessable_entity]);
     match cfg!(debug_assertions) {
@@ -100,7 +104,7 @@ fn rocket() -> _ {
             println!("{}", "*************************************".cyan());
             println!("Running in {} mode", "production".green());
             println!("{}", "*************************************".cyan());
-            rocket_app.mount("/auth", routes![login, register_by_email_password])
+            rocket_app.mount(base_url, routes![login, register_by_email_password])
         }
         true => {
             println!("{}", "*************************************".cyan());
@@ -108,21 +112,21 @@ fn rocket() -> _ {
             println!("{}", "*************************************".cyan());
             rocket_app
                 .mount(
-                    "/auth",
+                    base_url,
                     openapi_get_routes![login, register_by_email_password],
                 )
                 .mount(
-                    "/api/v1/swagger-ui/",
+                    format!("{}/api/v1/swagger-ui/", base_url),
                     make_swagger_ui(&SwaggerUIConfig {
-                        url: "../openapi.json".to_owned(),
+                        url: openapi_json_url.to_owned(),
                         ..Default::default()
                     }),
                 )
                 .mount(
-                    "/api/v1/rapidoc/",
+                    format!("{}/api/v1/rapidoc/", base_url),
                     make_rapidoc(&RapiDocConfig {
                         general: GeneralConfig {
-                            spec_urls: vec![UrlObject::new("General", "../openapi.json")],
+                            spec_urls: vec![UrlObject::new("General", &openapi_json_url)],
                             ..Default::default()
                         },
                         hide_show: HideShowConfig {
