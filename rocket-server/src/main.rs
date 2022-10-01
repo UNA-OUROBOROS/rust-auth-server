@@ -3,7 +3,7 @@ extern crate rocket;
 extern crate auth_server_lib;
 extern crate colored;
 
-use std::fmt::format;
+
 
 use colored::*;
 
@@ -12,7 +12,7 @@ use auth_server_lib::api::{endpoints, model};
 mod catchers;
 
 use rocket::{
-    http::{tls::rustls::internal::msgs::base, ContentType, Status},
+    http::{ContentType, Status},
     serde::json::{serde_json::json, Json},
 };
 
