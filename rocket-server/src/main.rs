@@ -59,7 +59,7 @@ fn register_by_email_password(
                 ContentType::JSON,
                 json!({
                     "result": "success",
-                    "credentials": user_id
+                    "user_id": user_id
                 }),
             ),
         ),

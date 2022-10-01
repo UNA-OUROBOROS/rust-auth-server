@@ -1,15 +1,6 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    applications (id) {
-        id -> Uuid,
-        friendly_name -> Varchar,
-        audience -> Varchar,
-        callback_url -> Varchar,
-    }
-}
-
-diesel::table! {
     login_applications (id) {
         id -> Uuid,
         friendly_name -> Varchar,
@@ -42,7 +33,6 @@ diesel::joinable!(user_emails -> users (user_id));
 diesel::joinable!(user_passwords -> users (user_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    applications,
     login_applications,
     user_emails,
     user_passwords,
