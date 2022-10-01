@@ -2,6 +2,7 @@
 [default]
 address = "0.0.0.0"
 
-[default.tls]
-key = "/devel/certs/private.pem"
-certs = "/devel/certs/public.pem"
+# uncomment for TLS support
+#[default.tls]
+#key = "/devel/certs/private.pem"
+#certs = "/devel/certs/public.pem"
