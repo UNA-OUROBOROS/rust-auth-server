@@ -1,31 +1,56 @@
+import 'package:auth_frontend/style/theme_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:auth_frontend/constants/themes/light_theme.dart' as light;
+import 'package:auth_frontend/constants/themes/dark_theme.dart' as dark;
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  // ensure that we have the scheduler binding initialized
+  WidgetsFlutterBinding.ensureInitialized();
+  // load the shared preferences from disk before the app is started
+  final prefs = await SharedPreferences.getInstance();
+
+  // create new theme controller, which will get the currently selected from shared preferences
+  final themeController = ThemeController(prefs);
+  runApp(MyApp(themeController: themeController));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  static const String title = 'OneAuth';
 
-  // This widget is the root of your application.
+  final ThemeController themeController;
+
+  const MyApp({Key? key, required this.themeController}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    // use AnimatedBuilder to listen to theme changes (listen to ChangeNotifier)
+    // the app will be rebuilt when the theme changes
+    return AnimatedBuilder(
+      animation: themeController,
+      builder: (context, _) {
+        // wrap app in inherited widget to provide the ThemeController to all pages
+        return ThemeControllerProvider(
+          controller: themeController,
+          child: MaterialApp(
+            title: title,
+            theme: _buildCurrentTheme(),
+            home: const MyHomePage(title: title),
+          ),
+        );
+      },
     );
+  }
+
+  // build the flutter theme from the saved theme string
+  ThemeData _buildCurrentTheme() {
+    switch (themeController.currentTheme) {
+      case "dark":
+        return dark.getTheme();
+      case "light":
+      default:
+        return light.getTheme();
+    }
   }
 }
 
