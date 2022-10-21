@@ -1,6 +1,6 @@
 {
-    "name": "auth_frontend",
-    "short_name": "auth_frontend",
+    "name": "oneauth",
+    "short_name": "oneauth",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

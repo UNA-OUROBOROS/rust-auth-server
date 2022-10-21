@@ -1,4 +1,4 @@
-# auth_frontend
+# oneauth
 
 A new Flutter project.
 

@@ -1,8 +1,8 @@
-import 'package:auth_frontend/style/theme_controller.dart';
+import 'package:oneauth/style/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:auth_frontend/constants/themes/light_theme.dart' as light;
-import 'package:auth_frontend/constants/themes/dark_theme.dart' as dark;
+import 'package:oneauth/constants/themes/light_theme.dart' as light;
+import 'package:oneauth/constants/themes/dark_theme.dart' as dark;
 
 Future<void> main() async {
   // ensure that we have the scheduler binding initialized

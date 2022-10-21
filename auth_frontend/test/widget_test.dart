@@ -5,11 +5,11 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:auth_frontend/style/theme_controller.dart';
+import 'package:oneauth/style/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:auth_frontend/main.dart';
+import 'package:oneauth/main.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
