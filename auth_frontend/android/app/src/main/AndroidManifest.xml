@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.oneauth">
+    package="net.rnvn.oneauth">
    <application
         android:label="oneauth"
         android:name="${applicationName}"

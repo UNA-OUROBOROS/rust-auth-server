@@ -1,4 +1,4 @@
-package com.example.oneauth
+package net.rnvn.oneauth
 
 import io.flutter.embedding.android.FlutterActivity
 
