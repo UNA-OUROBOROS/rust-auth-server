@@ -1,5 +1,5 @@
 import 'package:oneauth/pages/login.dart';
-import 'package:oneauth/style/theme_controller.dart';
+import 'package:oneauth/util/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:oneauth/constants/themes/light_theme.dart' as light;
