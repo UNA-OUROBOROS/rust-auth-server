@@ -1,4 +1,5 @@
 import 'package:oneauth/pages/login.dart';
+import 'package:oneauth/util/lang_controller.dart';
 import 'package:oneauth/util/theme_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,17 +12,22 @@ Future<void> main() async {
   // load the shared preferences from disk before the app is started
   final prefs = await SharedPreferences.getInstance();
 
-  // create new theme controller, which will get the currently selected from shared preferences
-  final themeController = ThemeController(prefs);
-  runApp(MyApp(themeController: themeController));
+  runApp(MyApp(
+      themeController: ThemeController(prefs),
+      languageController: await LanguageController.createController(prefs)));
 }
 
 class MyApp extends StatelessWidget {
   static const String title = 'OneAuth';
 
   final ThemeController themeController;
+  final LanguageController languageController;
 
-  const MyApp({Key? key, required this.themeController}) : super(key: key);
+  const MyApp(
+      {Key? key,
+      required this.themeController,
+      required this.languageController})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,14 +36,15 @@ class MyApp extends StatelessWidget {
     return AnimatedBuilder(
       animation: themeController,
       builder: (context, _) {
-        // wrap app in inherited widget to provide the ThemeController to all pages
-        return ThemeControllerProvider(
-          controller: themeController,
-          child: MaterialApp(
-              title: title,
-              theme: _buildCurrentTheme(),
-              home: const LoginPage(title: title)),
-        );
+        return LanguageControllerProvider(
+            controller: languageController,
+            child: ThemeControllerProvider(
+              controller: themeController,
+              child: MaterialApp(
+                  title: title,
+                  theme: _buildCurrentTheme(),
+                  home: const LoginPage()),
+            ));
       },
     );
   }

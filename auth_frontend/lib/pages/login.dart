@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:oneauth/util/lang_controller.dart';
 
 /// Example app widget
 class LoginPage extends StatelessWidget {
   /// Main app widget.
-  const LoginPage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
+  const LoginPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -24,16 +23,17 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
+    final lang = LanguageController.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text("login"),
+        title: Text(lang.getTranslation('login-title')),
       ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const <Widget>[
+          children: <Widget>[
             Text(
-              'English',
+              lang.getTranslation("current-lang-name"),
             ),
           ],
         ),
