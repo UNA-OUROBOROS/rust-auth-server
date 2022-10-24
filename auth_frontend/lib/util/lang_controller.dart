@@ -37,6 +37,9 @@ class LanguageController extends ChangeNotifier {
 
   String get currentLanguage => _currentLanguage;
   bool get preferSystemLanguage => _preferSystemLanguage;
+  Future<Image> get getFlag async {
+    return Image.asset('assets/lang/flags/$_currentLanguage.png');
+  }
 
   Future<void> setLanguage(
     String language, {
@@ -106,7 +109,8 @@ class LanguageController extends ChangeNotifier {
 
   static Future<FluentBundle> _loadBundle(String language) async {
     try {
-      final messages = await rootBundle.loadString('assets/lang/$language.ftl');
+      final messages =
+          await rootBundle.loadString('assets/lang/translation/$language.ftl');
       final bundle = FluentBundle(language);
       bundle.addMessages(messages);
       return bundle;
