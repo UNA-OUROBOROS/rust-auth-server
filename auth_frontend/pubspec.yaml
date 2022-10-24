@@ -70,10 +70,10 @@ flutter:
     - assets/lang/info.json
     # language bundles
     - assets/lang/translation/en_US.ftl
-    - assets/lang/translation/es.ftl
+    - assets/lang/translation/es_CR.ftl
     # flag language icons
     - assets/lang/flags/en_US.png
-    - assets/lang/flags/es.png
+    - assets/lang/flags/es_CR.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

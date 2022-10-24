@@ -1,9 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:fluent/fluent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:oneauth/util/lang/exceptions.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'lang/language.dart';
 
 /// provides information about the current language and its translations
 class LanguageController extends ChangeNotifier {
@@ -37,8 +41,38 @@ class LanguageController extends ChangeNotifier {
 
   String get currentLanguage => _currentLanguage;
   bool get preferSystemLanguage => _preferSystemLanguage;
+
   Future<Image> get getFlag async {
     return Image.asset('assets/lang/flags/$_currentLanguage.png');
+  }
+
+  // returns a dictionary with all the available languages
+  Future<List<Language>> get getLanguages async {
+    List<Language> languages = [];
+    String infoJson;
+    try {
+      // get info.json
+      infoJson = await rootBundle.loadString('assets/lang/info.json');
+    } catch (e) {
+      throw TranslationsMetadataNotFoundException();
+    }
+    // parse the json
+    try {
+      Map<String, dynamic> info = jsonDecode(infoJson);
+      // get the languages
+      if (info.containsKey('languages')) {
+        List<dynamic> languagesJson = info['languages'];
+        for (var languageJson in languagesJson) {
+          Language language = await Language.fromJson(languageJson);
+          languages.add(language);
+        }
+      } else {
+        throw Exception("languages key not found");
+      }
+    } on Exception catch (e) {
+      throw TranslationsMetadataCorruptedException(e);
+    }
+    return languages;
   }
 
   Future<void> setLanguage(
@@ -147,39 +181,5 @@ class LanguageControllerProvider extends InheritedWidget {
   @override
   bool updateShouldNotify(LanguageControllerProvider oldWidget) {
     return controller != oldWidget.controller;
-  }
-}
-
-class TranslationException implements Exception {
-  TranslationException(this.message, this.errors);
-
-  final String message;
-  final List<Error> errors;
-
-  @override
-  String toString() {
-    return '$message: $errors';
-  }
-}
-
-class TranslationMessageNotFoundException implements Exception {
-  TranslationMessageNotFoundException(this.message);
-
-  final String message;
-
-  @override
-  String toString() {
-    return '$message not found';
-  }
-}
-
-class TranslationBundleNotFoundException implements Exception {
-  TranslationBundleNotFoundException(this.language);
-
-  final String language;
-
-  @override
-  String toString() {
-    return 'No bundle available for $language';
   }
 }
