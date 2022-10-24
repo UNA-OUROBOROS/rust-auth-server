@@ -27,6 +27,29 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(lang.getTranslation('login-title')),
+        actions: [
+          SizedBox(
+            height: double.infinity,
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+              ),
+              onPressed: () {
+                // show a dialog to select the language
+              },
+              child: FutureBuilder(
+                future: lang.getFlag,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return snapshot.data as Widget;
+                  }
+                  return const CircularProgressIndicator();
+                },
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
