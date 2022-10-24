@@ -1,0 +1,13 @@
+{
+    "__comment": "this file contains the metadata of the translations",
+    "translations": [
+        {
+            "language": "en_US",
+            "name": "English (United States)"
+        },
+        {
+            "language": "es_CR",
+            "nativeName": "Español (Costa Rica)"
+        }
+    ]
+}
