@@ -35,7 +35,8 @@ class LanguageController extends ChangeNotifier {
     LanguageController controller =
         LanguageController._(prefs, defaultLanguage);
     // load the current language
-    await controller.setLanguage(controller._currentLanguage);
+    await controller.setLanguage(controller._currentLanguage,
+        fallback: _defaultLanguage);
     return controller;
   }
 
@@ -103,7 +104,7 @@ class LanguageController extends ChangeNotifier {
       }
     }
     _bundle = bundle;
-    _currentLanguage = language;
+    _currentLanguage = bundle.locale;
     _prefs.setString(languagePrefKey, language);
     notifyListeners();
   }
