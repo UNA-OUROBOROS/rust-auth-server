@@ -15,12 +15,11 @@ class LanguageController extends ChangeNotifier {
   // (before the underscore)
   static const _defaultLanguage = 'en_US';
 
-  LanguageController._(
-      this._prefs, FluentBundle initialBundle, String defaultLanguage) {
+  LanguageController._(this._prefs, String defaultLanguage) {
     String? language = _prefs.getString(languagePrefKey);
     _preferSystemLanguage = _prefs.getBool(preferSystemLanguagePrefKey) ?? true;
     _currentLanguage = language ?? defaultLanguage;
-    _bundle = initialBundle;
+    _bundle = FluentBundle("");
     // override the language if the user prefers the System language
     if (_preferSystemLanguage) {
       _currentLanguage = Platform.localeName;
@@ -29,25 +28,41 @@ class LanguageController extends ChangeNotifier {
 
   static Future<LanguageController> createController(SharedPreferences prefs,
       {String defaultLanguage = LanguageController._defaultLanguage}) async {
-    FluentBundle bundle = await LanguageController._loadBundle(defaultLanguage);
-    return LanguageController._(prefs, bundle, defaultLanguage);
+    LanguageController controller =
+        LanguageController._(prefs, defaultLanguage);
+    // load the current language
+    await controller.setLanguage(controller._currentLanguage);
+    return controller;
   }
 
   String get currentLanguage => _currentLanguage;
   bool get preferSystemLanguage => _preferSystemLanguage;
 
-  void setLanguage(String language, {String? fallback}) async {
+  Future<void> setLanguage(
+    String language, {
+    // allows to try with the version without the country code
+    bool allowGeneric = true,
+    // fallback if the requested language is not available
+    String? fallback,
+  }) async {
     late FluentBundle bundle;
     try {
       bundle = await _loadBundle(_currentLanguage);
     } catch (e) {
-      // try to load the fallback language
-      if (fallback != null) {
-        bundle = await _loadBundle(fallback);
-      }
-      // just rethrow the exception if no fallback was provided
-      else {
+      try {
+        if (allowGeneric) {
+          bundle = await _loadBundle(_currentLanguage.split('_').first);
+        }
         rethrow;
+      } catch (e) {
+        // try to load the fallback language
+        if (fallback != null) {
+          bundle = await _loadBundle(fallback);
+        }
+        // just rethrow the exception if no fallback was provided
+        else {
+          rethrow;
+        }
       }
     }
     _bundle = bundle;
@@ -56,11 +71,15 @@ class LanguageController extends ChangeNotifier {
     notifyListeners();
   }
 
-  void setPreferSystemLanguage(bool preferSystemLanguage) {
+  Future<void> setPreferSystemLanguage(bool preferSystemLanguage) async {
     // lets check if the system language is available by setting it
     // with fallback to the default language
     try {
-      setLanguage(Platform.localeName, fallback: _defaultLanguage);
+      await setLanguage(
+        Platform.localeName,
+        allowGeneric: true,
+        fallback: _defaultLanguage,
+      );
       _preferSystemLanguage = preferSystemLanguage;
       _prefs.setBool(preferSystemLanguagePrefKey, preferSystemLanguage);
       notifyListeners();
