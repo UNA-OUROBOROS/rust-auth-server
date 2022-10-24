@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:fluent/fluent.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +8,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// provides information about the current language and its translations
 class LanguageController extends ChangeNotifier {
   static const languagePrefKey = 'language';
+  static const preferSystemLanguagePrefKey = 'preferSystemLanguage';
   // consists of the base language and the country code(if available)
   // if the language is not available, the default language is used
   // if the the country code is not available take the default language
@@ -15,8 +18,13 @@ class LanguageController extends ChangeNotifier {
   LanguageController._(
       this._prefs, FluentBundle initialBundle, String defaultLanguage) {
     String? language = _prefs.getString(languagePrefKey);
+    _preferSystemLanguage = _prefs.getBool(preferSystemLanguagePrefKey) ?? true;
     _currentLanguage = language ?? defaultLanguage;
     _bundle = initialBundle;
+    // override the language if the user prefers the System language
+    if (_preferSystemLanguage) {
+      _currentLanguage = Platform.localeName;
+    }
   }
 
   static Future<LanguageController> createController(SharedPreferences prefs,
@@ -26,6 +34,7 @@ class LanguageController extends ChangeNotifier {
   }
 
   String get currentLanguage => _currentLanguage;
+  bool get preferSystemLanguage => _preferSystemLanguage;
 
   void setLanguage(String language, {String? fallback}) async {
     late FluentBundle bundle;
@@ -45,6 +54,20 @@ class LanguageController extends ChangeNotifier {
     _currentLanguage = language;
     _prefs.setString(languagePrefKey, language);
     notifyListeners();
+  }
+
+  void setPreferSystemLanguage(bool preferSystemLanguage) {
+    // lets check if the system language is available by setting it
+    // with fallback to the default language
+    try {
+      setLanguage(Platform.localeName, fallback: _defaultLanguage);
+      _preferSystemLanguage = preferSystemLanguage;
+      _prefs.setBool(preferSystemLanguagePrefKey, preferSystemLanguage);
+      notifyListeners();
+    } catch (e) {
+      // we cannot use even the default language, rethrow
+      rethrow;
+    }
   }
 
   // gets the translation for the given key
@@ -73,9 +96,12 @@ class LanguageController extends ChangeNotifier {
     }
   }
 
-  final SharedPreferences _prefs;
   late String _currentLanguage;
+  late bool _preferSystemLanguage;
+
   late FluentBundle _bundle;
+
+  final SharedPreferences _prefs;
 
   /// get the controller from any page of your app
   static LanguageController of(BuildContext context) {
