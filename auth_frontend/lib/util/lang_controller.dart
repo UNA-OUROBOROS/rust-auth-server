@@ -27,8 +27,20 @@ class LanguageController extends ChangeNotifier {
 
   String get currentLanguage => _currentLanguage;
 
-  void setLanguage(String language) async {
-    FluentBundle bundle = await _loadBundle(_currentLanguage);
+  void setLanguage(String language, {String? fallback}) async {
+    late FluentBundle bundle;
+    try {
+      bundle = await _loadBundle(_currentLanguage);
+    } catch (e) {
+      // try to load the fallback language
+      if (fallback != null) {
+        bundle = await _loadBundle(fallback);
+      }
+      // just rethrow the exception if no fallback was provided
+      else {
+        rethrow;
+      }
+    }
     _bundle = bundle;
     _currentLanguage = language;
     _prefs.setString(languagePrefKey, language);
