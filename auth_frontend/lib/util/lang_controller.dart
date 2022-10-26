@@ -48,7 +48,7 @@ class LanguageController extends ChangeNotifier {
   }
 
   // returns a dictionary with all the available languages
-  Future<List<Language>> get getLanguages async {
+  Future<List<Language>> get languages async {
     List<Language> languages = [];
     String infoJson;
     try {
@@ -85,11 +85,11 @@ class LanguageController extends ChangeNotifier {
   }) async {
     late FluentBundle bundle;
     try {
-      bundle = await _loadBundle(_currentLanguage);
+      bundle = await _loadBundle(language);
     } catch (e) {
       try {
         if (allowGeneric) {
-          bundle = await _loadBundle(_currentLanguage.split('_').first);
+          bundle = await _loadBundle(language.split('_').first);
         }
         rethrow;
       } catch (e) {
@@ -105,7 +105,8 @@ class LanguageController extends ChangeNotifier {
     }
     _bundle = bundle;
     _currentLanguage = bundle.locale;
-    _prefs.setString(languagePrefKey, language);
+    await _prefs.setString(languagePrefKey, language);
+    await setPreferSystemLanguage(false);
     notifyListeners();
   }
 
@@ -113,11 +114,13 @@ class LanguageController extends ChangeNotifier {
     // lets check if the system language is available by setting it
     // with fallback to the default language
     try {
-      await setLanguage(
-        Platform.localeName,
-        allowGeneric: true,
-        fallback: _defaultLanguage,
-      );
+      if (preferSystemLanguage) {
+        await setLanguage(
+          Platform.localeName,
+          allowGeneric: true,
+          fallback: _defaultLanguage,
+        );
+      }
       _preferSystemLanguage = preferSystemLanguage;
       _prefs.setBool(preferSystemLanguagePrefKey, preferSystemLanguage);
       notifyListeners();

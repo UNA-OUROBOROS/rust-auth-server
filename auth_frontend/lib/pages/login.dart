@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:oneauth/util/lang/language.dart';
 import 'package:oneauth/util/lang_controller.dart';
 
 /// Example app widget
@@ -35,8 +36,54 @@ class _LoginScreenState extends State<LoginScreen> {
                 backgroundColor: Colors.transparent,
                 elevation: 0,
               ),
-              onPressed: () {
+              onPressed: () async {
+                LanguageController lc = LanguageController.of(context);
+                List<Language> languages = await lc.languages;
+
                 // show a dialog to select the language
+                showDialog(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text(lang.getTranslation('select-a-language')),
+                    content: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      // map its flag and name
+                      // also add a default language
+                      children:
+                          // default system language
+                          [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: ListTile(
+                                    title: Text(lc
+                                        .getTranslation("system-default-lang")),
+                                    onTap: () {
+                                      lc.setPreferSystemLanguage(true);
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                    },
+                                  ),
+                                )
+                              ] +
+                              languages
+                                  .map(
+                                    (e) => Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: ListTile(
+                                        leading: e.flag,
+                                        title: Text(e.name),
+                                        onTap: () {
+                                          lc.setLanguage(e.code);
+                                          Navigator.pop(context);
+                                          setState(() {});
+                                        },
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                    ),
+                  ),
+                );
               },
               child: FutureBuilder(
                 future: lang.getFlag,
