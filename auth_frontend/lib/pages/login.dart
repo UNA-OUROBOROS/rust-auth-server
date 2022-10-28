@@ -1,6 +1,8 @@
+import 'package:day_night_switcher/day_night_switcher.dart';
 import 'package:flutter/material.dart';
 import 'package:oneauth/util/lang/language.dart';
 import 'package:oneauth/util/lang_controller.dart';
+import 'package:oneauth/util/theme_controller.dart';
 
 /// Example app widget
 class LoginPage extends StatelessWidget {
@@ -25,10 +27,21 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final lang = LanguageController.of(context);
+    final isDarkMode = ThemeController.of(context).currentTheme == 'dark';
     return Scaffold(
       appBar: AppBar(
         title: Text(lang.getTranslation('login-title')),
         actions: [
+          SizedBox(
+            height: double.infinity,
+            child: DayNightSwitcherIcon(
+              isDarkModeEnabled: isDarkMode,
+              // do nothing on state change
+              onStateChanged: (_) {
+                ThemeController.of(context).toggleTheme();
+              },
+            ),
+          ),
           SizedBox(
             height: double.infinity,
             child: ElevatedButton(

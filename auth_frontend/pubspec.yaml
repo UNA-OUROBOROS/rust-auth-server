@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   shared_preferences: ^2.0.15
   fluent: ^2.0.1
+  day_night_switcher: ^0.2.0+1
 
 dev_dependencies:
   flutter_test:
