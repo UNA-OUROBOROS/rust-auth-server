@@ -76,6 +76,35 @@ class LanguageController extends ChangeNotifier {
     return languages;
   }
 
+  Future<String?> getFallbackLanguage(String language) async {
+    String infoJson;
+    try {
+      // get info.json
+      infoJson = await rootBundle.loadString('assets/lang/info.json');
+    } catch (e) {
+      throw TranslationsMetadataNotFoundException();
+    }
+    // parse the json
+    try {
+      Map<String, dynamic> info = jsonDecode(infoJson);
+      // get the languages
+      if (info.containsKey('fallbacks')) {
+        List<dynamic> languagesJson = info['fallbacks'];
+        for (var languageJson in languagesJson) {
+          String code = languageJson['code'];
+          if (code == language) {
+            return languageJson['fallback'];
+          }
+        }
+        return null;
+      } else {
+        throw Exception("languages key not found");
+      }
+    } on Exception catch (e) {
+      throw TranslationsMetadataCorruptedException(e);
+    }
+  }
+
   Future<void> setLanguage(
     String language, {
     // allows to try with the version without the country code
@@ -89,9 +118,17 @@ class LanguageController extends ChangeNotifier {
     } catch (e) {
       try {
         if (allowGeneric) {
-          bundle = await _loadBundle(language.split('_').first);
+          String? fallbackLanguage = await getFallbackLanguage(language);
+          if (fallbackLanguage != null) {
+            bundle = await _loadBundle(fallbackLanguage);
+          } else {
+            String baseLang = _defaultLanguage.split('_')[0];
+            fallbackLanguage = await getFallbackLanguage(baseLang);
+            bundle = await _loadBundle(fallbackLanguage ?? baseLang);
+          }
+        } else {
+          rethrow;
         }
-        rethrow;
       } catch (e) {
         // try to load the fallback language
         if (fallback != null) {

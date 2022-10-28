@@ -9,5 +9,15 @@
             "code": "es_CR",
             "name": "Español (Costa Rica)"
         }
+    ],
+    "fallbacks": [
+        {
+            "code": "en",
+            "fallback": "en_US"
+        },
+        {
+            "code": "es",
+            "fallback": "es_CR"
+        }
     ]
 }
