@@ -27,11 +27,22 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool _obscureText = true;
+  bool _rememberMe = false;
 
   void _toggle() {
     setState(() {
       _obscureText = !_obscureText;
     });
+  }
+
+  void toggleRememberMe() {
+    setState(() {
+      _rememberMe = !_rememberMe;
+    });
+  }
+
+  void toggleTheme() {
+    ThemeController.of(context).toggleTheme();
   }
 
   @override
@@ -48,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
               isDarkModeEnabled: isDarkMode,
               // do nothing on state change
               onStateChanged: (_) {
-                ThemeController.of(context).toggleTheme();
+                toggleTheme();
               },
             ),
           ),
@@ -157,94 +168,105 @@ class _LoginScreenState extends State<LoginScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              // the login box with a form that does not fills the screen
               Container(
-                // semi-transparent
-                color: Theme.of(context).cardColor.withOpacity(0.5),
-                width: 300,
-                child: Center(
-                  // a card that does not fill the screen
-                  // with rounded corners
-                  child: Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          // the title
-                          Text(
-                            lang.getTranslation('login-title'),
-                            style: Theme.of(context).textTheme.headline6,
-                          ),
-                          // the form
-                          Form(
-                            child: Column(
-                              children: <Widget>[
-                                // the email field
-                                TextFormField(
-                                  decoration: InputDecoration(
-                                    labelText: lang
-                                        .getTranslation('username-or-email'),
-                                  ),
-                                ),
-                                // the password field (with a button to show/hide the password)
-                                TextFormField(
-                                  decoration: InputDecoration(
-                                    labelText: lang.getTranslation('password'),
-                                    suffixIcon: IconButton(
-                                      icon: const Icon(Icons.remove_red_eye),
-                                      onPressed: () {
-                                        _toggle();
-                                      },
-                                    ),
-                                  ),
-                                  obscureText: _obscureText,
-                                ),
-                                // forgot password text (right aligned)
-                                Align(
-                                  alignment: Alignment.centerRight,
-                                  child: TextButton(
-                                    onPressed: () {},
-                                    child: Text(
-                                      lang.getTranslation('forgot-password'),
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .bodyText2!
-                                          .copyWith(
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
-                                          ),
-                                    ),
-                                  ),
-                                ),
-                                // the login button
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 16.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      // do nothing
-                                    },
-                                    child: Text(lang.getTranslation('login')),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+                  constraints: const BoxConstraints(maxWidth: 500),
+                  child: createCard(context, lang)),
             ],
           ),
         ),
       ]),
+    );
+  }
+
+  Card createCard(BuildContext context, LanguageController lang) {
+    return Card(
+      color: Theme.of(context).cardColor.withOpacity(0.8),
+      elevation: 10,
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            // the title
+            Text(
+              lang.getTranslation('login-title'),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+            // the form
+            Form(
+              child: Column(
+                children: <Widget>[
+                  // the email field
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: lang.getTranslation('username-or-email'),
+                    ),
+                  ),
+                  // the password field (with a button to show/hide the password)
+                  TextFormField(
+                    decoration: InputDecoration(
+                      labelText: lang.getTranslation('password'),
+                      suffixIcon: IconButton(
+                        icon: const Icon(Icons.remove_red_eye),
+                        onPressed: () {
+                          _toggle();
+                        },
+                      ),
+                    ),
+                    obscureText: _obscureText,
+                  ),
+                  Flex(
+                    // convert the direction to vertical if the width is less than 600
+                    direction: Axis.horizontal,
+                    children: <Widget>[
+                      // remember me checkbox
+                      Row(
+                        children: <Widget>[
+                          Checkbox(
+                            value: _rememberMe,
+                            onChanged: (bool? value) {
+                              toggleRememberMe();
+                            },
+                          ),
+                          Text(lang.getTranslation('remember-me')),
+                        ],
+                      ),
+                      // forgot password text
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          lang.getTranslation('forgot-password'),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // do nothing
+                        },
+                        child: Text(lang.getTranslation('login')),
+                      ),
+                    ),
+                  ),
+                  // register text
+                  TextButton(
+                    onPressed: () {},
+                    child: Text(
+                      lang.getTranslation('register'),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
