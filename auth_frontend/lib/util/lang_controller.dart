@@ -105,7 +105,7 @@ class LanguageController extends ChangeNotifier {
     }
   }
 
-  Future<void> setLanguage(
+  Future<LanguageController> setLanguage(
     String language, {
     // allows to try with the version without the country code
     bool allowGeneric = true,
@@ -122,7 +122,7 @@ class LanguageController extends ChangeNotifier {
           if (fallbackLanguage != null) {
             bundle = await _loadBundle(fallbackLanguage);
           } else {
-            String baseLang = _defaultLanguage.split('_')[0];
+            String baseLang = language.split('_')[0];
             fallbackLanguage = await getFallbackLanguage(baseLang);
             bundle = await _loadBundle(fallbackLanguage ?? baseLang);
           }
@@ -143,11 +143,12 @@ class LanguageController extends ChangeNotifier {
     _bundle = bundle;
     _currentLanguage = bundle.locale;
     await _prefs.setString(languagePrefKey, language);
-    await setPreferSystemLanguage(false);
     notifyListeners();
+    return this;
   }
 
-  Future<void> setPreferSystemLanguage(bool preferSystemLanguage) async {
+  Future<LanguageController> setPreferSystemLanguage(
+      bool preferSystemLanguage) async {
     // lets check if the system language is available by setting it
     // with fallback to the default language
     try {
@@ -161,6 +162,7 @@ class LanguageController extends ChangeNotifier {
       _preferSystemLanguage = preferSystemLanguage;
       _prefs.setBool(preferSystemLanguagePrefKey, preferSystemLanguage);
       notifyListeners();
+      return this;
     } catch (e) {
       // we cannot use even the default language, rethrow
       rethrow;

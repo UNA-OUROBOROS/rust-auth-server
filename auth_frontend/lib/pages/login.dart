@@ -58,9 +58,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                     title: Text(lc
                                         .getTranslation("system-default-lang")),
                                     onTap: () {
-                                      lc.setPreferSystemLanguage(true);
-                                      Navigator.pop(context);
-                                      setState(() {});
+                                      lc
+                                          .setPreferSystemLanguage(true)
+                                          .then((_) {
+                                        Navigator.pop(context);
+                                        setState(() {});
+                                      });
                                     },
                                   ),
                                 )
@@ -73,9 +76,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                         leading: e.flag,
                                         title: Text(e.name),
                                         onTap: () {
-                                          lc.setLanguage(e.code);
-                                          Navigator.pop(context);
-                                          setState(() {});
+                                          lc.setLanguage(e.code).then((c) => c
+                                              .setPreferSystemLanguage(false)
+                                              .then((_) => {
+                                                    Navigator.pop(context),
+                                                    setState(() {})
+                                                  }));
                                         },
                                       ),
                                     ),
